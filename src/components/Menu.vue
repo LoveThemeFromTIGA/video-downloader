@@ -1,20 +1,22 @@
 <template>
     <el-menu
+        router
         default-active="1"
         class="menu"
     >
+    <el-menu-item index="/"><el-icon class="ali-icon-shipinxiazai"></el-icon>Video downloader</el-menu-item>
      <el-sub-menu index="1">
             <template #title>
-            <el-icon><img src="../assets/douyin.svg" width="16" height="16"></el-icon>
+            <el-icon class="ali-icon-douyin"></el-icon>
             <span>抖音</span>
             </template>
-            <el-menu-item index="1-1">单个视频下载</el-menu-item>
-            <el-menu-item index="1-2">用户所有视频</el-menu-item>      
+            <el-menu-item index="/douyin/single">分享链接下载</el-menu-item>
+            <el-menu-item index="/douyin/muplite">用户主页下载</el-menu-item>      
     </el-sub-menu>
 
     <el-sub-menu index="2">
             <template #title>
-            <el-icon><img src="../assets/bilibili.svg" width="16" height="16"></el-icon>
+            <el-icon class="ali-icon-bilibili"></el-icon>
             <span>B站</span>
             </template>
     </el-sub-menu>
@@ -24,6 +26,7 @@
 </template>
 
 <script lang="ts" setup>
+import { DownCircleOutlined } from '@ant-design/icons-vue';
 import { ref } from 'vue'
 import {
   Document,

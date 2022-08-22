@@ -4,7 +4,8 @@
     "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
     "devPath": "http://localhost:5173",
-    "distDir": "../dist"
+    "distDir": "../dist",
+    "withGlobalTauri": true
   },
   "package": {
     "productName": "video-downloader",
@@ -17,7 +18,7 @@
     "bundle": {
       "active": true,
       "category": "DeveloperTool",
-      "copyright": "",
+      "copyright": "ClassmateLin",
       "deb": {
         "depends": []
       },
@@ -29,7 +30,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.classmatelin.video-downloader",
+      "identifier": "com.classmatelin.videodownloader",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -56,10 +57,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 800,
         "resizable": true,
         "title": "Video downloader",
-        "width": 800
+        "width": 1000
       }
     ]
   }

@@ -1,16 +1,48 @@
-# Vue 3 + TypeScript + Vite
+# Video Downloader
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## 简介
 
-## Recommended IDE Setup
+![index](./docs/imgs/index.png)
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+**基于[rust](https://www.rust-lang.org/) + [tauri](https://github.com/tauri-apps/tauri) 开发的一款跨平台的多线程视频下载器。**
 
-## Type Support For `.vue` Imports in TS
+支持平台:
+- windows
+- mac
+- linux
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+技术栈:
+- [rust](https://www.rust-lang.org/)
+- [tokio](https://tokio.rs/)
+- [tauri](https://tauri.app/) 
+- [typescript](https://www.typescriptlang.org/) 
+- [vue](https://vuejs.org/)
+- [Element Plus](https://element-plus.org/zh-CN/)
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+多线程下载实现:
+
+- 通过异步运行时tokio开启多个协程, 分别下载视频文件的分片(http range)。
+
+
+
+
+## 功能
+
+### 抖音
+
+#### 单个视频下载
+
+- 通过解析抖音分享的视频链接下载无水印视频。例如分享链接:  https://v.douyin.com/jpLRaaf/
+
+![单视频下载](./docs/imgs/douyin_single_download.png)
+
+#### 用户主页视频批量下载
+
+- 通过用户主页链接搜索用户视频进行下载。 例如:  https://v.douyin.com/j3XPKMg/, https://www.douyin.com/user/MS4wLjABAAAAWiOs23d6NtmiUg98zONd6wQhmPsy1WLwZn0jEaCbDL8
+
+![用户主页视频下载](./docs/imgs/douyin_muplit_download.png)
+
+### B站
+
+- 暂未完成

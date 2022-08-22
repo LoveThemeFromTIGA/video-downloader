@@ -1,0 +1,30 @@
+{
+  "id": "3604148",
+  "name": "ele-icon",
+  "font_family": "iconfont",
+  "css_prefix_text": "ali-icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "2012299",
+      "name": "视频下载",
+      "font_class": "shipinxiazai",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "18166694",
+      "name": "抖音",
+      "font_class": "douyin",
+      "unicode": "e8db",
+      "unicode_decimal": 59611
+    },
+    {
+      "icon_id": "26267546",
+      "name": "bilibili",
+      "font_class": "bilibili",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    }
+  ]
+}
