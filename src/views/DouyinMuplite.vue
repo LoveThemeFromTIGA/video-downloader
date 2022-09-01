@@ -18,7 +18,6 @@ type VideoInfoItem = {
   video_title: string, // 视频标题
   video_url: string,  // 视频链接
   cover_url: string, // 视频封面URL
-  //music_url: string, // 视频音频URL
 }
 
 type VideoInfo = {
@@ -35,7 +34,6 @@ type UserVideoInfo = {
     user_info: UserInfo,
     video_info: VideoInfo,
 }
-const selectPlaceholder = ref()
 const isSearching = ref(false)
 const tableData = ref(Array())
 const selectedList = ref(Array())
@@ -48,7 +46,6 @@ const form = reactive({
 
 const isDownloading = ref(false);
 
-
 const onSearch = async () => {
   const unlisten = appWindow.listen('douyin_get_all_video_info', (data: any) => {
       let video_info: VideoInfo = data.payload
@@ -56,14 +53,13 @@ const onSearch = async () => {
         tableData.value.push(video_info.items[i])
       }
       if (!video_info.has_more) {
-        ElMessage.success("搜索完成")
+        ElMessage.success(`搜索完成, 共找到${tableData.value.length}个视频.`)
       }
   })
   try {
     isSearching.value = true
     const data: UserVideoInfo = await invoke('douyin_muplit_search', { homeUrl: form.home_url})
     tableData.value = data.video_info.items
-    selectPlaceholder.value = "共选中0条记录"
     await invoke('douyin_get_all_video_info', {
        uid: data.user_info.uid, 
        videoCount: data.user_info.video_count,
@@ -79,24 +75,26 @@ const onSearch = async () => {
 
 const onSelectionChange = (obj: any) => {
   selectedList.value = obj
-  selectPlaceholder.value = "共选中" + selectedList.value.length + "条记录"
 }
 
 const onClear = () => {
   tableRef.value!.clearSelection()
   selectedList.value = []
-  selectPlaceholder.value = "共选中" + selectedList.value.length + "条记录"
 }
 
 const onDownloadItem = async (index: number) => {
     try{
-      const save_dir = (await dialog.open({ directory: true})) as string
+      const save_dir = (await dialog.open({ directory: true}))
+      if (!save_dir) {
+        ElMessage.error("取消下载")
+        return
+      }
       tableData.value[index].is_downloading = true
       isDownloading.value = true
       const info = tableData.value[index]
-      tableData.value[index].save_path = save_dir + "/" + info.video_title + ".mp4"
-      const res = await invoke("douyin_single_download", { savePath: tableData.value[index].save_path, videoUrl: info.video_url})
-      tableData.value[index].downloaded_success = true
+      let save_path = save_dir + "/" + info.video_title + ".mp4"
+      tableData.value[index].save_path = await invoke("douyin_single_download", { savePath: save_path, videoUrl: info.video_url})
+      tableData.value[index].is_success = true
       ElMessage.success("下载成功")
     }catch (e) {
       ElMessage.error("下载失败, 错误:" + e)
@@ -108,9 +106,13 @@ const onDownloadItem = async (index: number) => {
 
 const onDownloadSelected = async () => {
   try {
-    const save_dir = (await dialog.open({ directory: true})) as string
+    const save_dir = (await dialog.open({ directory: true}))
+    if (!save_dir){
+        ElMessage.error("取消下载")
+        return
+    }
     isDownloading.value = true
-    await downlad(selectedList.value, save_dir)
+    await downlad(selectedList.value, save_dir as string)
   }catch (e) {
     ElMessage.error("下载失败, 错误:" + e)
   }finally {
@@ -123,9 +125,13 @@ const onDownloadSelected = async () => {
 
 const onDownloadAll = async () => { 
   try {
-    const save_dir = (await dialog.open({ directory: true})) as string
+    const save_dir = (await dialog.open({ directory: true}))
+    if (!save_dir){
+        ElMessage.error("取消下载")
+        return
+    }
     isDownloading.value = true
-    await downlad(tableData.value, save_dir)
+    await downlad(tableData.value, save_dir as string)
   }catch (e) {
     ElMessage.error("下载失败, 错误:" + e)
   }finally {
@@ -163,7 +169,7 @@ const downlad = async (items: any, save_dir: string) => {
         if (video_id_list.includes(tableData.value[i].video_id)) {
           tableData.value[i].is_downloading = true
         }
-      }
+    }
     await invoke("douyin_muplit_download", { items: items, saveDir: save_dir})
     isDownloading.value = false
     ElMessage.success("下载完成")
@@ -217,7 +223,7 @@ const onOpen = async (index: number) => {
       fit-input-width="true"
       class="operate-select"
       max-height="100"
-      :placeholder="selectPlaceholder"
+      :placeholder="`共选中${selectedList.length}条记录`"
       disabled="true"
     >
     </el-select>
@@ -261,7 +267,7 @@ const onOpen = async (index: number) => {
           <el-row v-if="!scope.row.is_downloading">下载</el-row>
           <el-row v-else>下载中</el-row>
         </el-button>
-        <el-button v-else link type="primary" size="small" @click="onOpen(scope.$index)" :icon="DownloadOutlined" :disabled="scope.row.down">打开</el-button>
+        <el-button v-else link type="primary" size="small" @click="onOpen(scope.$index)" :icon="DownloadOutlined">打开</el-button>
         <el-button link type="primary" size="small" @click="onPreview(scope.$index)" :icon="EyeOutlined">预览</el-button>
       </template>
     </el-table-column>

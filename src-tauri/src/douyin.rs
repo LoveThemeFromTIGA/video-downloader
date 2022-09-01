@@ -195,11 +195,11 @@ pub async fn douyin_single_search(url: String) -> Result<UserVideoInfo, String> 
 
 
 #[tauri::command]
-pub async fn douyin_single_download(save_path: String, video_url: String, window: Window) -> Result<(), String> {
+pub async fn douyin_single_download(save_path: String, video_url: String, window: Window) -> Result<String, String> {
     let downloader = Downloader::new(video_url, save_path, Some(8))
         .await
         .map_err(|_|DouyinError::SystemError.to_string())?;
-
+    let save_path = downloader.get_save_path();
     let downloader_clone = downloader.clone();
     tokio::spawn(async move {
         let total_size = downloader_clone.total_size();
@@ -220,7 +220,7 @@ pub async fn douyin_single_download(save_path: String, video_url: String, window
         },
         Err(_) => return Err(DouyinError::DownloadVideoError.to_string()),
     };
-    Ok(())
+    Ok(save_path)
 }
 
 

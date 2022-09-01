@@ -6,7 +6,7 @@ const routes = [
         name: "Home",
         component: () => import("./views/Home.vue"),
         meta: {
-            keepAlive: false,
+            keepAlive: true,
         }
     },
     {
@@ -14,7 +14,7 @@ const routes = [
         name: "DouyinSignle",
         component: () => import("./views/DouyinSingle.vue"),
         meta: {
-            keepAlive: false,
+            keepAlive: true,
         }
     },
     {
@@ -22,7 +22,7 @@ const routes = [
         name: "DouyinMuplite",
         component: () => import("./views/DouyinMuplite.vue"),
         meta: {
-            keepAlive: false,
+            keepAlive: true,
         }
     },
 ];

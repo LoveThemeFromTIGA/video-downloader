@@ -46,11 +46,16 @@ const onDownload = async (index: number) => {
         percentage.value = data.payload.percentage
     })
     try{
-      const save_dir = (await dialog.open({ directory: true})) as string
+      const save_dir = (await dialog.open({ directory: true}))
+      if (!save_dir){
+        unlisten.then((f)=> f())
+        ElMessage.error("取消下载")
+        return
+      }
       isDownloading.value = true
       const info = videoTable.value[index]
       save_path.value = save_dir + "/" + info.video_title + ".mp4"
-      const res = await invoke("douyin_single_download", { savePath: save_path.value, videoUrl: info.video_url})
+      save_path.value = await invoke("douyin_single_download", { savePath: save_path.value, videoUrl: info.video_url})
       percentage.value = 0
       isDownloadSuccess.value = true
       ElMessage.success("下载成功")

@@ -4,22 +4,24 @@ use reqwest::Client;
 use tokio::sync::RwLock;
 use anyhow::Result;
 use log::error;
+use std::path::Path;
 
 const USER_AGNET: &'static str = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1";
+
 
 #[derive(Debug, Clone)]
 pub struct Downloader {
     url: Arc<String>,
-    savepath: Arc<String>,
     filesize: Arc<u64>,
+    savepath: Arc<String>,
     support_range: Arc<bool>,
     chunk_count: Arc<u8>,
-    rw_lock: Arc<RwLock<u64>>
+    rw_lock: Arc<RwLock<u64>>,
 }
 
 #[cfg(any(windows))]
 async fn write_bytes_to_file(filepath: &str, bytes: &[u8], offset: u64) -> Result<usize, std::io::Error> {
-    use std::{os::windows::fs::FileExt, fs::File};
+    use std::os::windows::fs::FileExt;
     let file = fs::OpenOptions::new()
                 .create(true)
                 .write(true)
@@ -64,9 +66,45 @@ impl Downloader {
         .await?;
         
         let url = Arc::new(url);
-        let savepath = Arc::new(savepath);
-        let filesize = Arc::new(response.content_length().unwrap());
 
+        let file_extension = match response.headers().get("content-type") {
+            Some(content_type) => match content_type.to_str().unwrap_or("video/mp4") {
+                "video/x-flv" => ".flv",
+                "video/mp4" => ".mp4",
+                "application/x-mpegURL" => ".m3u8",
+                "video/MP2T" => ".ts",
+                "video/3gpp" => ".3gpp",
+                "video/quicktime" => ".mov",
+                "video/x-msvideo" => ".avi",
+                "video/x-ms-wmv" => ".wmv",
+                "audio/x-wav" => ".wav",
+                "audio/x-mp3" => ".mp3",
+                "audio/mp4"   => ".mp4",
+                "application/ogg" => ".ogg",
+                "image/jpeg" => ".jpeg",
+                "image/png"  => ".png",
+                "image/tiff" => ".tiff",
+                "image/gif"  => ".gif",
+                "image/svg+xml" => ".svg",
+                _ => ".mp4"
+            },
+            None => ".mp4",
+        }.to_string();
+
+        let path = Path::new(&savepath);
+        let dir = path.parent().unwrap();
+        let file_stem = path.file_stem()
+            .unwrap()
+            .to_str()
+            .unwrap();
+        let filename = format!("{}{}", file_stem, file_extension);
+        let savepath = Arc::new(dir.join(filename)
+            .to_str()
+            .unwrap()
+            .to_string()
+        );
+
+        let filesize = Arc::new(response.content_length().unwrap());
         let chunk_count = Arc::new(match chunk_count {
             Some(c) => c,
             None => 4,
@@ -100,10 +138,15 @@ impl Downloader {
     pub async fn downloaded_size(&self) -> u64 {
         *self.rw_lock.read().await
     }
+    
+    pub fn get_save_path(&self) -> String {
+        self.savepath.to_string()
+    }
 
     fn is_support_range(&self) -> bool {
         *self.support_range
     }
+
 
     async fn plain_download(&self) -> Result<bool> {
         let client = Client::builder()
